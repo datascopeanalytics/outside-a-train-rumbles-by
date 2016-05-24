@@ -1,0 +1,7 @@
+# normal stuff (emacs crap files and python stuff)
+*~
+*.pyc
+
+# the json file with results
+web/data/train-times.json
+settings.py

@@ -1,0 +1,33 @@
+/* red: #c60c30 */
+/* blue: #00a1de */
+/* brown: #62361b */
+/* green: #009b3a */
+/* orange: #f9461c */
+/* purple: #522398 */
+/* pink: #e27ea6 */
+/* yellow: #f9e300 */
+/* grey: "#565a5c" */
+p {
+    font-size: 50px;
+    font-weight: bold;
+    text-align: center;
+    /* text-transform: uppercase; */
+    font-family: "Adelle Sans", sans-serif;
+    color: #565a5c;
+}
+.el {
+}
+.tracks {
+    width: 200%;
+    margin-left: -50%;
+    background-image: url('/img/tracks.png');
+    background-repeat: repeat-x;
+    position: relative;
+}
+.train {
+    display: inline-block;
+    position: absolute;
+}
+.car {
+    display: inline-block;
+}

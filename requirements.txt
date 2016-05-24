@@ -1,0 +1,1 @@
+-e git+https://github.com/iandees/ctaapi.git@cbba22cd406618c58c4c46b098ac72f46f67c111#egg=ctaapi
