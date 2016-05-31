@@ -24,9 +24,10 @@ COLORS = {
     'P': 'purple',
     'Pink': 'pink',
 }
+
+# Green line has two directions which will be determined on the fly
 DIRECTIONS = {
     'brown': 'northbound',
-    'green': 'northbound',
     'orange': 'southbound',
     'purple': 'northbound',
     'pink': 'southbound',
@@ -58,9 +59,7 @@ class TrainTracker(ctaapi.TrainTracker):
 
 def get_color(info_list):
     """Takes a list of arrival results from the API for the same run
-    number and returns the color of the train. Assumes everything with
-    the same run number is the same color (which I think is true, but
-    not totally sure...)
+    number and returns the color of the train.
 
     """
     for station, info in info_list:
@@ -79,7 +78,7 @@ def get_color(info_list):
         return color
 
 
-def get_direction(info_list, color):
+def get_direction(info_list,color):
     """Use the results from the API to get the direction this train is
     going. Currently just assumes everything with the given color goes
     in the same direction, which isn't actually correct (for example,
@@ -89,8 +88,20 @@ def get_direction(info_list, color):
     actual direction the train is going for this run number
 
     """
+
     try:
-        direction = DIRECTIONS[color]
+        if color == 'green':
+            station, info = info_list[0]
+            """ trDr = 1: northbound, 5: southbound
+            Assume no other numbers will be given, but if other show up, just make the train southbound.
+
+            """
+            if info['trDr'] == 1:
+                direction = 'northbound'
+            else:
+                direction = 'southbound'
+        else:
+            direction = DIRECTIONS[color]
     except KeyError:
         logging.error(str(color))
         logging.error(str(info_list))
@@ -157,11 +168,12 @@ def main():
         grouped_by_run[arrival['run_number']].append(
             (arrival['station_id'], arrival))
 
+
     # "decorate" by when the train will pass so that it's easy to sort
     decorated = []
     for run_number, info_list in grouped_by_run.iteritems():
         color = get_color(info_list)
-        direction = get_direction(info_list, color)
+        direction = get_direction(info_list,color)
         pass_time = get_pass_time(info_list, color, direction)
         decorated.append((pass_time, {
             'pass_time': pass_time,
