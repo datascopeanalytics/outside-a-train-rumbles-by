@@ -80,12 +80,7 @@ def get_color(info_list):
 
 def get_direction(info_list,color):
     """Use the results from the API to get the direction this train is
-    going. Currently just assumes everything with the given color goes
-    in the same direction, which isn't actually correct (for example,
-    the Green Line goes both ways around the loop).
-
-    TODO: fix this function to give correct results based on the
-    actual direction the train is going for this run number
+    going.
 
     """
 
@@ -96,7 +91,7 @@ def get_direction(info_list,color):
             Assume no other numbers will be given, but if other show up, just make the train southbound.
 
             """
-            if info['trDr'] == 1:
+            if info['direction'] == 1:
                 direction = 'northbound'
             else:
                 direction = 'southbound'
