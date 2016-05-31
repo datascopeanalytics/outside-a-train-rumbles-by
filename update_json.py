@@ -78,7 +78,7 @@ def get_color(info_list):
         return color
 
 
-def get_direction(info_list,color):
+def get_direction(info_list, color):
     """Use the results from the API to get the direction this train is
     going.
 
@@ -91,7 +91,7 @@ def get_direction(info_list,color):
             Assume no other numbers will be given, but if other show up, just make the train southbound.
 
             """
-            if info['direction'] == 1:
+            if info['direction'] == '1':
                 direction = 'northbound'
             else:
                 direction = 'southbound'
