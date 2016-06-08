@@ -8,6 +8,8 @@ import datetime
 import json
 import logging
 import time
+import boto3
+import botocore
 
 import ctaapi
 import settings
@@ -105,7 +107,7 @@ def get_direction(info_list, color):
     return direction
 
 
-def get_pass_time(info_list, color, direction):
+def get_pass_time(info_list, direction):
     """Using the arrival times, estimate when the train is going to pass
     the Datascope office. Returns the result as a "milliseconds since
     epoch" timestamp so that it's easy to deal with in javascript.
@@ -118,25 +120,43 @@ def get_pass_time(info_list, color, direction):
     # of the stations.
     if len(info_list) == 1:
         station, info = info_list[0]
-        if station == RANDOLPH and direction == 'northbound':
-            pass_time = info['arrival_time'] - datetime.timedelta(minutes=1)
-            result = unix_time(pass_time)
-        elif station == ADAMS and direction == 'southbound':
-            pass_time = info['arrival_time'] - datetime.timedelta(minutes=1)
-            result = unix_time(pass_time)
+        if station == RANDOLPH:
+            if direction == 'northbound':
+                pass_time = info['arrival_time'] - datetime.timedelta(minutes=0.6)
+                result = unix_time(pass_time)
+            else:
+                pass_time = info['arrival_time'] + datetime.timedelta(minutes=0.6)
+                result = unix_time(pass_time)
+        elif station == ADAMS:
+            if direction == 'southbound':
+                pass_time = info['arrival_time'] - datetime.timedelta(minutes=1.3)
+                result = unix_time(pass_time)
+            else:
+                pass_time = info['arrival_time'] + datetime.timedelta(minutes=1.3)
+                result = unix_time(pass_time)
 
-    # most will probably have two: assume Datascope is halfway between
+    # most will probably have two: Datascope is 1/3 of way from RANDOLPH between
     # RANDOLPH and ADAMS stations
     elif len(info_list) == 2:
         (station_a, info_a), (station_b, info_b) = info_list
         arrive_a = unix_time(info_a['arrival_time'])
         arrive_b = unix_time(info_b['arrival_time'])
-        result = (arrive_a + arrive_b) / 2
+
+        # make arrive_a always the first arrival time
+        if arrive_a > arrive_b:
+            arrive_a, arrive_b = arrive_b, arrive_a
+
+        if direction == 'southbound':
+            result = (2 * arrive_a + arrive_b) / 3
+        else:
+            result = (arrive_a + 2 * arrive_b) / 3
 
     # never seen this before, but warning just in case
+    # TODO: it turns out that 3 item in info_list happen, need to understand when
     else:
         msg = 'unknown case with %i elements in info list' % len(info_list)
         logging.warning(msg)
+        logging.warning(str(info_list))
 
     # just to be safe, fall back to "now" for any results that don't
     # make sense.
@@ -148,7 +168,7 @@ def get_pass_time(info_list, color, direction):
 
 def main():
     """Find estimated pass-by times/direction/color for all trains that
-    will pass by in the next 10 minutes or so. return the result as a
+    will pass by in the next 15 minutes or so. return the result as a
     JSON string.
 
     """
@@ -163,13 +183,12 @@ def main():
         grouped_by_run[arrival['run_number']].append(
             (arrival['station_id'], arrival))
 
-
     # "decorate" by when the train will pass so that it's easy to sort
     decorated = []
     for run_number, info_list in grouped_by_run.iteritems():
         color = get_color(info_list)
-        direction = get_direction(info_list,color)
-        pass_time = get_pass_time(info_list, color, direction)
+        direction = get_direction(info_list, color)
+        pass_time = get_pass_time(info_list, direction)
         decorated.append((pass_time, {
             'pass_time': pass_time,
             'color': color,
@@ -184,6 +203,12 @@ def main():
 
 if __name__ == '__main__':
 
+    # Write file to disk
     json_string = main()
     with open('web/data/train-times.json', 'w') as outfile:
         outfile.write(json_string)
+
+    # Upload file to website
+    s3 = boto3.Session(profile_name="Website").resource('s3')
+    obj = s3.Bucket('staging.datascopeanalytics.com').Object('static/train-times.json')
+    obj.upload_file('web/data/train-times.json')
