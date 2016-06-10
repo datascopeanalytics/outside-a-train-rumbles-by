@@ -20,7 +20,7 @@ p {
 .tracks {
     width: 200%;
     margin-left: -50%;
-    background-image: url('/img/tracks.png');
+    background-image: url('../img/tracks.png');
     background-repeat: repeat-x;
     position: relative;
 }
