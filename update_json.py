@@ -8,8 +8,6 @@ import datetime
 import json
 import logging
 import time
-import boto3
-import botocore
 
 import ctaapi
 import settings
@@ -27,7 +25,7 @@ COLORS = {
     'Pink': 'pink',
 }
 
-# Green line has two directions which will be determined on the fly
+# Green line has two directions which will be determined in get_direction()
 DIRECTIONS = {
     'brown': 'northbound',
     'orange': 'southbound',
@@ -107,7 +105,7 @@ def get_direction(info_list, color):
     return direction
 
 
-def get_pass_time(info_list, direction):
+def get_pass_time(info_list, direction, color):
     """Using the arrival times, estimate when the train is going to pass
     the Datascope office. Returns the result as a "milliseconds since
     epoch" timestamp so that it's easy to deal with in javascript.
@@ -151,8 +149,12 @@ def get_pass_time(info_list, direction):
         else:
             result = (arrive_a + 2 * arrive_b) / 3
 
-    # never seen this before, but warning just in case
-    # TODO: it turns out that 3 item in info_list happen, need to understand when
+    # info_list has 3 items for Green line in the beginning of operations around 3.30am-4am
+    # will return current time for this case without returning any warning
+    elif len(info_list) == 3 & color == 'green':
+        result = unix_time(datetime.datetime.now())
+
+    # Warning any other weird cases
     else:
         msg = 'unknown case with %i elements in info list' % len(info_list)
         logging.warning(msg)
@@ -188,7 +190,7 @@ def main():
     for run_number, info_list in grouped_by_run.iteritems():
         color = get_color(info_list)
         direction = get_direction(info_list, color)
-        pass_time = get_pass_time(info_list, direction)
+        pass_time = get_pass_time(info_list, direction, color)
         decorated.append((pass_time, {
             'pass_time': pass_time,
             'color': color,
@@ -207,8 +209,3 @@ if __name__ == '__main__':
     json_string = main()
     with open('web/data/train-times.json', 'w') as outfile:
         outfile.write(json_string)
-
-    # Upload file to website
-    s3 = boto3.Session(profile_name="Website").resource('s3')
-    obj = s3.Bucket('staging.datascopeanalytics.com').Object('static/train-times.json')
-    obj.upload_file('web/data/train-times.json')
