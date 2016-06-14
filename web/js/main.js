@@ -79,15 +79,27 @@ var cta_train_rumbling = function(){
       return t2.getTime() - t1.getTime();
     };
 
+    var timeouts = []; // collection of all train schedule
+
+    // Remove all previously scheduled train
+    var clearAllTimeOuts = function(timeouts) {
+        for (var i = 0; i < timeouts.length; i++) {
+            clearTimeout(timeouts[i]);
+        }
+        //quick reset of the timer array you just cleared
+        timeouts = [];
+    }
+
     // schedule and trigger the passage of each train at the right time
     result.schedule_the_train_rumble = function(data) {
         var now = new Date();
+        clearAllTimeOuts(timeouts) // Remove all previously scheduled train
         _.each(data, function (item) {
           var delay = milliseconds_between(now, new Date(item.pass_time));
           if (delay > 0) {
             var message = "scheduling " + item.direction + " " + item.color + " line train for " + new Date(item.pass_time);
             console.log(message);
-            window.setTimeout(whoosh, delay, item.color, item.direction);
+            timeouts.push(window.setTimeout(whoosh, delay, item.color, item.direction));
           };
         });
     };
