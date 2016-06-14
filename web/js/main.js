@@ -26,9 +26,9 @@ var cta_train_rumbling = function(){
       pink: "#e27ea6",
       yellow: "#f9e300",
       grey: "#565a5c"
-    }
+    };
 
-    result.whoosh = function(color, direction) {
+    var whoosh = function(color, direction) {
 
       // print a poetic message to the console
       var word = "A ";
@@ -73,11 +73,24 @@ var cta_train_rumbling = function(){
         // console.log('woosh ended');
         // train.remove();
       });
-    }
+    };
 
-    result.milliseconds_between = function(t1, t2) {
+    var milliseconds_between = function(t1, t2) {
       return t2.getTime() - t1.getTime();
-    }
+    };
+
+    // schedule and trigger the passage of each train at the right time
+    result.schedule_the_train_rumble = function(data) {
+        var now = new Date();
+        _.each(data, function (item) {
+          var delay = milliseconds_between(now, new Date(item.pass_time));
+          if (delay > 0) {
+            var message = "scheduling " + item.direction + " " + item.color + " line train for " + new Date(item.pass_time);
+            console.log(message);
+            window.setTimeout(whoosh, delay, item.color, item.direction);
+          };
+        });
+    };
 
     return result
 
@@ -94,14 +107,13 @@ $(document).ready(function () {
 
   // trigger the passage of each train at the right time
   $.getJSON("./data/train-times.json", function(data) {
-    var now = new Date();
-    _.each(data, function (item) {
-      var delay = cta_train_rumbling.milliseconds_between(now, new Date(item.pass_time));
-      if (delay > 0) {
-	var message = "scheduling " + item.direction + " " + item.color + " line train for " + new Date(item.pass_time);
-	console.log(message);
-	window.setTimeout(cta_train_rumbling.whoosh, delay, item.color, item.direction);
-      }
+        return cta_train_rumbling.schedule_the_train_rumble(data)
+  });
+
+  // check for new schedule when the browser tab is in focus
+  $(window).focus(function(){
+    $.getJSON("./data/train-times.json", function(data) {
+        return cta_train_rumbling.schedule_the_train_rumble(data)
     });
   });
 });
