@@ -7,6 +7,10 @@
 /* pink: #e27ea6 */
 /* yellow: #f9e300 */
 /* grey: "#565a5c" */
+body {
+    margin: 0 0 0 0;
+}
+
 p {
     font-size: 50px;
     font-weight: bold;
@@ -18,7 +22,7 @@ p {
 .el {
 }
 .tracks {
-    width: 200%;
+    max-width: 200%;
     margin-left: -50%;
     background-image: url('../img/tracks.png');
     background-repeat: repeat-x;

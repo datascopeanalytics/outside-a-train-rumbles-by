@@ -42,7 +42,7 @@ var cta_train_rumbling = function(){
       var begin = far_left;
       var end = far_right;
       var track = "." + direction;
-      if (direction === "northbound") {
+      if (direction === "southbound") {
         begin = far_right;
         end = far_left;
       }
@@ -71,7 +71,7 @@ var cta_train_rumbling = function(){
         left: end
       }, transition_speed, 'linear', function () {
         // console.log('woosh ended');
-        // train.remove();
+        train.remove();
       });
     };
 
