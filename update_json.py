@@ -29,7 +29,7 @@ COLORS = {
 DIRECTIONS = {
     'brown': 'northbound',
     'orange': 'southbound',
-    'purple': 'northbound',
+    'purple': 'southbound',
     'pink': 'southbound',
 }
 
