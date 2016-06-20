@@ -149,9 +149,9 @@ def get_pass_time(info_list, direction, color):
         else:
             result = (arrive_a + 2 * arrive_b) / 3
 
-    # info_list has 3 items for Green line in the beginning of operations around 3.30am-4am
+    # info_list has more than 2 items for Green line in the beginning of operations around 3.30am-4am
     # will return current time for this case without returning any warning
-    elif (len(info_list) == 3) and (color == 'green'):
+    elif (len(info_list) > 2) and (color == 'green'):
         result = unix_time(datetime.datetime.now())
 
     # Warning any other weird cases
