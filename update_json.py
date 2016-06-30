@@ -69,10 +69,11 @@ def get_color(info_list):
         try:
             color = COLORS[info['route_name']]
         except KeyError:
-            logging.error(str(info))
-            msg = 'Need to add route name "%s" to the COLORS dictionary' % \
-                info['route_name']
-            raise KeyError(msg)
+            if info['approaching']:
+                logging.error(str(info))
+                msg = 'Need to add route name "%s" to the COLORS dictionary' % \
+                    info['route_name']
+                raise KeyError(msg)
 
         # return the color of the first result in the list
         return color
