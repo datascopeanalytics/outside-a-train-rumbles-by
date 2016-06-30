@@ -18,6 +18,8 @@ p {
     /* text-transform: uppercase; */
     font-family: "Adelle Sans", sans-serif;
     color: #565a5c;
+    margin: 0;
+    padding: 50px;
 }
 .el {
 }

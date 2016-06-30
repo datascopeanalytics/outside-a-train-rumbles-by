@@ -1,5 +1,7 @@
 // The global module
 var cta_train_rumbling = function(){
+
+
     var result = {};
 
     var far_left = "0%";
@@ -116,6 +118,8 @@ $(document).ready(function () {
     height: cta_train_rumbling.track_height,
     "background-size": 3 * cta_train_rumbling.track_height / 10 + "px " + cta_train_rumbling.track_height + "px"
   });
+
+  var pymChild = new pym.Child();
 
   // trigger the passage of each train at the right time
   $.getJSON("./data/train-times.json", function(data) {
