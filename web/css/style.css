@@ -9,18 +9,9 @@
 /* grey: "#565a5c" */
 body {
     margin: 0 0 0 0;
+    /*background-color: #1f1f1f;*/
 }
 
-p {
-    font-size: 50px;
-    font-weight: bold;
-    text-align: center;
-    /* text-transform: uppercase; */
-    font-family: "Adelle Sans", sans-serif;
-    color: #565a5c;
-    margin: 0;
-    padding: 50px;
-}
 .el {
 }
 .tracks {
