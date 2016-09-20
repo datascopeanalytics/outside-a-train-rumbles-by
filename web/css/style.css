@@ -20,6 +20,7 @@ p {
     color: #565a5c;
 }
 .el {
+    overflow: hidden;
 }
 .tracks {
     width: 200%;
